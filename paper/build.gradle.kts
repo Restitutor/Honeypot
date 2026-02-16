@@ -45,7 +45,7 @@ dependencies {
     compileOnly(libs.placeholder.api)
     compileOnly(libs.boosted.yaml)
     implementation(libs.bstats)
-    implementation(libs.spigui)
+    compileOnly(libs.spigui)
     implementation(project(":api"))
 
     compileOnly(libs.worldguard)
@@ -80,5 +80,4 @@ tasks.shadowJar {
     archiveBaseName.set("honeypot-${platform}")
     archiveClassifier.set("")
     relocate("org.bstats", "org.reprogle.honeypot.common.libs.bstats")
-    relocate("com.samjakob", "org.reprogle.honeypot.common.libs.spigui")
 }
