@@ -97,7 +97,7 @@ public class HoneypotRemove implements HoneypotSubCommand {
     }
 
     private void potRemovalCheck(Block block, Player p) {
-        assert block != null;
+        if (block == null) return;
         if (blockManager.isHoneypotBlock(block)) {
             blockManager.deleteBlock(block);
             p.sendMessage(commandFeedback.sendCommandFeedback("success", false));

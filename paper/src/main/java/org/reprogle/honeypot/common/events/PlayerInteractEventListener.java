@@ -70,14 +70,14 @@ public class PlayerInteractEventListener implements Listener {
     public void playerInteractEvent(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
-        if (player.getTargetBlockExact(5) == null)
-            return;
-        if (!(player.getTargetBlockExact(5).getState() instanceof Container))
-            return;
         if (!(event.getAction().equals(Action.RIGHT_CLICK_BLOCK)))
             return;
+        if (event.getClickedBlock() == null)
+            return;
+        if (!(event.getClickedBlock().getState() instanceof Container))
+            return;
 
-        Block block = player.getTargetBlockExact(5);
+        Block block = event.getClickedBlock();
 
         // We want to filter on inventories upon opening, not just creation (Like in the
         // HoneypotCreate class) because
@@ -105,7 +105,7 @@ public class PlayerInteractEventListener implements Listener {
                     && blockManager.isHoneypotBlock(Objects.requireNonNull(block))) {
 
                 // If any of the adapters state that this is a disallowed action, don't bother doing anything since it was already blocked
-                if (!adapterManager.checkAllAdapters(player, Objects.requireNonNull(player.getTargetBlockExact(5)).getLocation())) {
+                if (!adapterManager.checkAllAdapters(player, block.getLocation())) {
                     return;
                 }
 
@@ -138,9 +138,9 @@ public class PlayerInteractEventListener implements Listener {
     private void executeAction(PlayerInteractEvent event) {
 
         Player player = event.getPlayer();
-        Block block = player.getTargetBlockExact(5);
+        Block block = event.getClickedBlock();
 
-        assert block != null;
+        if (block == null) return;
         String action = blockManager.getAction(block);
 
         if (action == null) {

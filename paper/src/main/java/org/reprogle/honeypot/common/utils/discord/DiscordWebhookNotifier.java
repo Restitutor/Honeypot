@@ -24,8 +24,11 @@ import org.jetbrains.annotations.NotNull;
 import org.reprogle.honeypot.common.utils.HoneypotLogger;
 
 import java.io.IOException;
+import java.time.Instant;
 
 public class DiscordWebhookNotifier {
+
+    private static final OkHttpClient CLIENT = new OkHttpClient();
 
     private final WebhookActionType webhookType;
     private final String webhookUrl;
@@ -56,27 +59,24 @@ public class DiscordWebhookNotifier {
     public void send() {
         final String finalBody = getBodyString();
 
-        new Thread(() -> {
-            RequestBody body = RequestBody.create(finalBody, MediaType.get("application/json"));
+        RequestBody body = RequestBody.create(finalBody, MediaType.get("application/json"));
 
-            Request request = new Request.Builder()
-                    .url(webhookUrl)
-                    .post(body)
-                    .build();
+        Request request = new Request.Builder()
+                .url(webhookUrl)
+                .post(body)
+                .build();
 
-            new OkHttpClient().newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                    logger.severe(Component.text("Failed to send webhook: " + e.getMessage()));
-                }
+        CLIENT.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                logger.severe(Component.text("Failed to send webhook: " + e.getMessage()));
+            }
 
-                @Override
-                public void onResponse(@NotNull Call call, @NotNull Response response) {
-                    response.close();
-                }
-            });
-        }).start();
-
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) {
+                response.close();
+            }
+        });
     }
 
     private @NotNull String getBodyString() {
@@ -90,7 +90,7 @@ public class DiscordWebhookNotifier {
                       "description": "The honeypot located at %coordinates% in world %world% was triggered by %player%!",
                       "fields": [],
                       "title": "Honeypot Discord Alert - %webhookType%",
-                      "timestamp": "2024-06-24T00:32:00.000Z",
+                      "timestamp": "%timestamp%",
                       "color": 11636736,
                       "thumbnail": {
                         "url": "https://mc-heads.net/avatar/%UUID%"
@@ -108,7 +108,8 @@ public class DiscordWebhookNotifier {
             case BREAK -> jsonTemplate.replace("%webhookType%", "Block Broken");
         };
 
-        return tempBody.replace("%coordinates%", block.getX() + ", " + block.getY() + ", " + block.getZ())
+        return tempBody.replace("%timestamp%", Instant.now().toString())
+                .replace("%coordinates%", block.getX() + ", " + block.getY() + ", " + block.getZ())
                 .replace("%world%", "\\\"" + block.getWorld().getName() + "\\\"")
                 .replace("%player%", player.getName())
                 .replace("%UUID%", player.getUniqueId().toString());

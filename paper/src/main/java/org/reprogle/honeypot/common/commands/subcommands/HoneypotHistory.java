@@ -117,8 +117,8 @@ public class HoneypotHistory implements HoneypotSubCommand {
 
             } else if (args[1].equalsIgnoreCase("delete")) {
                 if (args.length >= 4) {
-                    playerHistoryManager.deletePlayerHistory(argPlayer,
-                            Integer.parseInt(args[3]));
+                    int count = Math.max(0, Math.min(Integer.parseInt(args[3]), 1000000));
+                    playerHistoryManager.deletePlayerHistory(argPlayer, count);
                 } else {
                     playerHistoryManager.deletePlayerHistory(argPlayer);
                 }

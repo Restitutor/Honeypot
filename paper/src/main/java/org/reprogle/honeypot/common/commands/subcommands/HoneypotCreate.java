@@ -99,9 +99,9 @@ public class HoneypotCreate implements HoneypotSubCommand {
         }
 
         // Check if the filter is enabled, and if so, if it's allowed
-        if (configManager.getPluginConfig().getBoolean("filters.blocks")
-                || configManager.getPluginConfig().getBoolean("filters.inventories")
-                && (!isAllowedPerFilters(block))) {
+        if ((configManager.getPluginConfig().getBoolean("filters.blocks")
+                || configManager.getPluginConfig().getBoolean("filters.inventories"))
+                && !isAllowedPerFilters(block)) {
             p.sendMessage(commandFeedback.sendCommandFeedback("against-filter"));
             return;
 
